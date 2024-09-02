@@ -801,4 +801,6 @@ zsdoc/data
 /tests/_output/*
 !/tests/_output/.gitkeep
 
+.idea
+
 # End of https://www.toptal.com/developers/gitignore/api/linux,python,cuda,c,c++,pycharm,visualstudiocode,macos,windows,latex,zsh
