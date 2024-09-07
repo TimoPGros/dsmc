@@ -1,4 +1,5 @@
 import numpy as np
+from dsmc.eval_results import eval_results
 
 from typing import List, Tuple, Any, Dict
 
@@ -70,7 +71,7 @@ class Evaluator:
     def register_property(self, property: Property):
         self.properties[property.name] = property
 
-    def run_policy(self, agent, num_episodes: int, results_per_property: Dict[str, EvaluationResults]):
+    def run_policy(self, agent, num_episodes: int, results_per_property: Dict[str, eval_results]):
         # TODO: this is only a barebones RL loop
         for _ in range(num_episodes):
             state = self.env.reset()
@@ -92,7 +93,7 @@ class Evaluator:
         results_per_property = {}
         converged_per_property = {}
         for property in self.properties.values():
-            results_per_property[property.name] = EvaluationResults(property=property.name)
+            results_per_property[property.name] = eval_results(property=property.name)
             converged_per_property[property.name] = False
 
         # run initial episodes - one run, such that the first run of the while loop checks convergence

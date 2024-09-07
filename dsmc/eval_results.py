@@ -1,21 +1,39 @@
-import pandas as pd
+import numpy as np
 
 class eval_results:
     
-    #TODO: number done episodes, property name
+    #TODO: number done episodes
     #TODO: getter for all, mean, variance, std, confidence interval
-    #TODO: add (extend)
-    #TODO: save_data(filename:property_data), write all the single outcomes
     
-    def __init__(result_dict):
-        self.result_dict = result_dict
+    def __init__(self, result_dict: np.array, property):
+        self.__result_dict = result_dict
+        self.property = property
     
-    def get_result(property_name: str):
-        try:
-            result = self.result_dict[property_name]
-            return result
-        except:
-            print("metric_name must be string")
+    def get_all(self):
+        return self.__result_dict
+            
+    def get_mean(self):
+        return np.mean(self.__result_dict)       
+    
+    def get_variance(self):
+        return np.var(self.__result_dict)        
+    
+    def get_std(self):
+        return np.std(self.__result_dict)       
+    
+    def get_confidence_interval(self, kappa: float, epsilon: float):
+        #length = len(self.__result_dict)
+        #return 2 * np.sqrt(self.get_variance() / length) * np.sqrt(kappa / length - 1) + epsilon
+        pass
+            
+    def extend(self, new_result: float):
+            self.__result_dict = np.append(self.__result_dict, np.array([new_result]))
         
+    def save_data(self, filename = 'eval_results.csv'):
+        try:
+            np.savetxt(filename, self.__result_dict, delimiter=',')
+            print(f"Data saved to {filename}")
+        except Exception as e:
+            print(f"Error saving data: {e}")
 
             
