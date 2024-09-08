@@ -8,6 +8,8 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.12"
 numpy = "^2.1.0"
+scipy = "^1.14.1"
+gymnasium = "^0.29.1"
 
 
 [build-system]

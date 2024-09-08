@@ -2,12 +2,12 @@ import numpy as np
 
 class eval_results:
     
-    #TODO: number done episodes
-    #TODO: getter for all, mean, variance, std, confidence interval
+    #TODO: getter for std, confidence interval
     
-    def __init__(self, result_dict: np.array, property):
-        self.__result_dict = result_dict
+    def __init__(self, property: str):
+        self.__result_dict = np.array([])
         self.property = property
+        self.total_episodes = 0
     
     def get_all(self):
         return self.__result_dict
@@ -19,8 +19,9 @@ class eval_results:
         return np.var(self.__result_dict)        
     
     def get_std(self):
-        return np.std(self.__result_dict)       
-    
+        #return np.std(self.__result_dict)       
+        pass
+        
     def get_confidence_interval(self, kappa: float, epsilon: float):
         #length = len(self.__result_dict)
         #return 2 * np.sqrt(self.get_variance() / length) * np.sqrt(kappa / length - 1) + epsilon

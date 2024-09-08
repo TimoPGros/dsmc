@@ -1,28 +1,32 @@
 import numpy as np
 from dsmc.eval_results import eval_results
+from scipy.stats import norm
+from gymnasium import Env as GymEnv
 
 from typing import List, Tuple, Any, Dict
 
 
-def CH(kappa, eps):
+def CH(kappa: float, eps: float):
     x = 1 / np.power(eps, 2)
     y = np.log(2 / (kappa))
     res = x * y
 
     return int(np.floor(res))
 
-def APMC(s2, kappa, eps):
-    z = st.norm.ppf(1 - kappa / 2)
-
+def APMC(s2: float, kappa: float, eps: float):
+    z = norm.ppf(1 - kappa / 2)
     return np.ceil(4 * z * s2 / np.power(eps, 2))
 
-def get_variance(results, kappa, epsilon):
+def get_variance(results, kappa: float, epsilon: float):
+    # TODO: implement this function
     pass
 
-def construct_confidence_interval_length(results, kappa, epsilon):
+def construct_confidence_interval_length(results, kappa: float, epsilon: float):
+    # TODO: implement this function
     pass
 
 # TODO: ALWAYS USE TYPE HINTS!!!
+# TODO: initial values
 # base class for evaluation properties
 class Property:
     def __init__(self, name: str):
@@ -71,24 +75,29 @@ class Evaluator:
     def register_property(self, property: Property):
         self.properties[property.name] = property
 
-    def run_policy(self, agent, num_episodes: int, results_per_property: Dict[str, eval_results]):
+    def run_policy(self, agent, num_episodes: int, results_per_property: Dict[str, eval_results], act_function = None):
+        if act_function is None:
+            act_function = agent.predict
+            
+        if not callable(act_function):
+            raise ValueError("act_function should be a function.")
+        
         # TODO: this is only a barebones RL loop
         for _ in range(num_episodes):
             state = self.env.reset()
             trajectory = []
             done = False
-            while not done:
-                action = agent.act(state)
-                next_state, reward, done, _ = self.env.step(action)
+            while not (terminated or truncated):
+                action = agent.act_function(state)
+                next_state, reward, terminated, truncated, _ = self.env.step(action)
                 trajectory.append((state, action, reward))
                 state = next_state
 
             # store new results in EvaluationResults object
             for property in self.properties.values():
-                # TODO: EvaluationResults class needs some kind of extend function that adds new results
                 results_per_property[property.name].extend(property.check(trajectory))
 
-    def eval(self, agent, epsilon: float, kappa: float):
+    def eval(self, agent, epsilon: float, kappa: float, act_function = None):
         # initialize EvaluationResults object for each class and whether the property converged
         results_per_property = {}
         converged_per_property = {}
@@ -97,16 +106,23 @@ class Evaluator:
             converged_per_property[property.name] = False
 
         # run initial episodes - one run, such that the first run of the while loop checks convergence
-        self.run_policy(agent, self.initial_episodes - self.episodes_per_run, results_per_property)
+        
+        #TODO: why - self.episodes_per_run?
+        
+        self.run_policy(agent, self.initial_episodes - self.episodes_per_run, results_per_property, act_function)
         made_episodes = self.initial_episodes - self.episodes_per_run
+        for property in self.properties.values():
+                results_per_property[property.name].total_episodes = self.initial_episodes - self.episodes_per_run
 
         # compute the CH bound
         ch_bound = CH(kappa, epsilon)
         # run the policy until all properties have converged
         while True:
             # run the policy for the specified number of episodes
-            self.run_policy(agent, self.episodes_per_run, results_per_property)
+            self.run_policy(agent, self.episodes_per_run, results_per_property, act_function)
             made_episodes += self.episodes_per_run
+            for property in self.properties.values():
+                results_per_property[property.name].total_episodes += self.episodes_per_run
 
             # compute for each property the APMC bound and the confidence interval length
             for property in self.properties.values():
