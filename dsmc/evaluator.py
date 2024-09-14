@@ -19,8 +19,9 @@ def __APMC(s2: float, kappa: float, eps: float):
     return np.ceil(4 * z * s2 / np.power(eps, 2))
 
 def __construct_confidence_interval_length(results: eval_results, kappa: float, epsilon: float):
-    # TODO: implement this function
-    pass
+    interval = results.get_confidence_interval(kappa, epsilon)
+    confidence_interval_length = interval[1] - interval[0]
+    return confidence_interval_length
 
 # base class for evaluation properties
 class Property:
