@@ -6,6 +6,8 @@ from gymnasium import Env as GymEnv
 
 from typing import List, Tuple, Any, Dict
 
+#DONE: Added type hints and default values
+#DONE: Made functions private
 
 def __CH(kappa: float, eps: float):
     x = 1 / np.power(eps, 2)
@@ -18,6 +20,7 @@ def __APMC(s2: float, kappa: float, eps: float):
     z = norm.ppf(1 - kappa / 2)
     return np.ceil(4 * z * s2 / np.power(eps, 2))
 
+#DONE: implemented this function
 def __construct_confidence_interval_length(results: eval_results, kappa: float, epsilon: float):
     interval = results.get_confidence_interval(kappa, epsilon)
     confidence_interval_length = interval[1] - interval[0]
@@ -38,6 +41,7 @@ class GoalReachingProbabilityProperty(Property):
     def __init__(self, name: str = "grp", goal_reward: float = 100):
         super().__init__(name)
         self.goal_reward = goal_reward
+        self.binomial = True
 
     def __check(self, trajectory: List[Tuple[Any, Any, Any]]) -> float:
         if trajectory[-1][2] == self.goal_reward:
@@ -50,6 +54,7 @@ class ReturnProperty(Property):
     def __init__(self, name: str = "return", gamma: float = 0.99):
         super().__init__(name)
         self.gamma = gamma
+        self.binomial = False
 
     def __check(self, trajectory: List[Tuple[Any, Any, Any]]) -> float:
         ret = 0
@@ -77,7 +82,7 @@ class Evaluator:
             
         if not callable(act_function):
             raise ValueError("act_function should be a function.")
-        
+        #DONE: Checked this RL loop
         for _ in range(num_episodes):
             state = self.env.reset()
             trajectory = []
