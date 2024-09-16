@@ -36,6 +36,7 @@ class Property:
     def __check(self, trajectory: List[Tuple[Any, Any, Any]]) -> float:
         pass
 
+#DONE: added binomial attribute
 # metric that checks if the goal has been reached
 class GoalReachingProbabilityProperty(Property):
     def __init__(self, name: str = "grp", goal_reward: float = 100):
@@ -108,12 +109,10 @@ class Evaluator:
 
         # run initial episodes - one run, such that the first run of the while loop checks convergence
         
-        #TODO: why -self.episodes_per_run?
-        
-        self.__run_policy(agent, self.initial_episodes - self.episodes_per_run, results_per_property, act_function)
-        made_episodes = self.initial_episodes - self.episodes_per_run
+        self.__run_policy(agent, self.initial_episodes, results_per_property, act_function)
+        made_episodes = self.initial_episodes
         for property in self.properties.values():
-                results_per_property[property.name].total_episodes = self.initial_episodes - self.episodes_per_run
+                results_per_property[property.name].total_episodes = self.initial_episodes
 
         # compute the CH bound
         ch_bound = __CH(kappa, epsilon)
