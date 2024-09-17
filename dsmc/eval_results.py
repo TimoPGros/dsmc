@@ -5,7 +5,7 @@ from scipy.stats import t
 class eval_results:
     
     #DONE: Added getters for all, mean, std, variance, confidence_interval
-    def __init__(self, property: str):
+    def __init__(self, property):
         self.__result_dict = np.array([])
         self.property = property
         self.total_episodes = 0
@@ -46,7 +46,7 @@ class eval_results:
         self.std = std     
         return std
         
-    def get_confidence_interval(self, kappa: float):
+    def get_confidence_interval(self, kappa: float = 0.05):
         if self.property.binomial:
             num1 = self.__result_dict.sum()
             num0 = self.total_episodes - num1

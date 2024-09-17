@@ -1,18 +1,34 @@
 import gymnasium as gym
-from stable_baselines3 import DQN
 from dsmc.evaluator import Evaluator
 
-env = gym.make("pgtg-v2")
+class RandomAgent:
+    def __init__(self, env):
+        self.env = env
 
-model = DQN("MlpPolicy", env,verbose=1)
+    def predict(self, state):
+        return self.env.action_space.sample()
+
+    def learn(self, total_timesteps):
+        for _ in range(total_timesteps):
+            state = self.env.reset()
+            terminated = False
+            truncated = False
+            while not (terminated or truncated):
+                action = self.predict(state)
+                _, _, terminated, truncated, _ = self.env.step(action)
+
+env = gym.make("CartPole-v1")
+
+model = RandomAgent(env)
 model.learn(total_timesteps=1000)
 
 evaluator = Evaluator(env=env)
 evaluator.register_property()
 results = evaluator.eval(model, epsilon=0.1, kappa=0.05)
 
-print(results.get_all())
-print(results.get_mean())
-print(results.get_variance())
-print(results.get_std())
-print(results.get_confidence_interval(0.05))
+print(results["return"])
+print(results["return"].get_all())
+print(results["return"].get_mean())
+print(results["return"].get_variance())
+print(results["return"].get_std())
+print(results["return"].get_confidence_interval())
