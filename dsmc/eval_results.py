@@ -4,7 +4,6 @@ from scipy.stats import t
 
 class eval_results:
     
-    #DONE: Added getters for all, mean, std, variance, confidence_interval
     def __init__(self, property):
         self.__result_dict = np.array([])
         self.property = property
@@ -83,12 +82,10 @@ class eval_results:
             ]
 
             return interval
-    
-    #Done: Implemented this function        
+           
     def extend(self, new_result: float):
             self.__result_dict = np.append(self.__result_dict, np.array([new_result]))
-     
-    #Done: Implemented this function   
+       
     def save_data(self, filename = 'eval_results.csv'):
         try:
             np.savetxt(filename, self.__result_dict, delimiter=',')
