@@ -5,7 +5,7 @@ class RandomAgent:
     def __init__(self, env):
         self.env = env
 
-    def predict(self, state):
+    def predict(self, _):
         return self.env.action_space.sample()
 
     def learn(self, total_timesteps):

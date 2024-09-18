@@ -1,12 +1,10 @@
-import numpy as np
 from dsmc.eval_results import eval_results
-from scipy.stats import norm
 import gymnasium as gym
 from gymnasium import Env as GymEnv
 from dsmc.property import Property, ReturnProperty
 import dsmc.statistics as stats
 
-from typing import List, Tuple, Any, Dict
+from typing import Dict
 
 class Evaluator:
 
@@ -74,7 +72,7 @@ class Evaluator:
                 property_results = results_per_property[property.name]
 
                 apmc_bound = stats.APMC(property_results.get_variance(), kappa, epsilon)
-                confidence_interval_length = stats.construct_confidence_interval_length(property_results, kappa, epsilon)
+                confidence_interval_length = stats.construct_confidence_interval_length(property_results, kappa)
 
                 # check if the property has converged, property can also become non-converged again!!!
                 if made_episodes > ch_bound or made_episodes > apmc_bound or confidence_interval_length < 2 * epsilon:
