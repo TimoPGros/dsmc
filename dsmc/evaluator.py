@@ -42,7 +42,9 @@ class Evaluator:
             for property in self.properties.values():
                 results_per_property[property.name].extend(property.check(trajectory))
 
-    def eval(self, agent, epsilon: float = 0.1, kappa: float = 0.05, act_function = None):
+    # 2 modes: either results are saved in json file after each n episodes or only at the end
+    # json file is named after the corresponding property
+    def eval(self, agent, epsilon: float = 0.1, kappa: float = 0.05, act_function = None, save_interim_results: bool = False):
         # initialize EvaluationResults object for each class and whether the property converged
         results_per_property = {}
         converged_per_property = {}
@@ -81,6 +83,10 @@ class Evaluator:
                     converged_per_property[property.name] = False
 
             if all(converged_per_property.values()):
+                if not save_interim_results:
+                    for property in self.properties.values():
+                        property_results = results_per_property[property.name]
+                        property_results.save_data_end()
                 break
 
         return results_per_property

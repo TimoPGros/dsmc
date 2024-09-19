@@ -1,5 +1,6 @@
 import gymnasium as gym
 from dsmc.evaluator import Evaluator
+import dsmc.property as prop
 
 class RandomAgent:
     def __init__(self, env):
@@ -24,11 +25,6 @@ model.learn(total_timesteps=1000)
 
 evaluator = Evaluator(env=env)
 evaluator.register_property()
+grp_prop = prop.GoalReachingProbabilityProperty()
+evaluator.register_property(grp_prop)
 results = evaluator.eval(model, epsilon=0.1, kappa=0.05)
-
-print(results["return"])
-print(results["return"].get_all())
-print(results["return"].get_mean())
-print(results["return"].get_variance())
-print(results["return"].get_std())
-print(results["return"].get_confidence_interval())

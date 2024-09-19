@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.stats import norm
 from scipy.stats import t
+import json
 
 class eval_results:
     
@@ -84,13 +85,23 @@ class eval_results:
             return interval
            
     def extend(self, new_result: float):
-            self.__result_dict = np.append(self.__result_dict, np.array([new_result]))
-       
-    def save_data(self, filename = 'eval_results.csv'):
-        try:
-            np.savetxt(filename, self.__result_dict, delimiter=',')
-            print(f"Data saved to {filename}")
-        except Exception as e:
-            print(f"Error saving data: {e}")
-
+            self.__result_dict = np.append(self.__result_dict, np.array([new_result]))          
+    
+    def save_data_end(self, filename = None):
+        if filename is None:
+            filename = self.property.name + '.json'
+        data = {}
+        data['property'] = self.property.name
+        data['mean'] = self.get_mean()
+        data['variance'] = self.get_variance()
+        data['std'] = self.get_std()
+        data['confidence_interval'] = self.get_confidence_interval()
+        with open(filename, 'w') as f:
+            json.dump(data, f, indent=4)
+        print(f"Data saved to {filename}")
+        return data
+    
+    def save_data_interim(self, filename = None):
+        #TODO: implement
+        pass
             
