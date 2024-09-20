@@ -87,9 +87,9 @@ class eval_results:
     def extend(self, new_result: float):
             self.__result_dict = np.append(self.__result_dict, np.array([new_result]))          
     
+    # DONE: implemented save_data_end and save_data_interim
+    # DONE: switched to json format
     def save_data_end(self, filename = None):
-        if filename is None:
-            filename = self.property.name + '.json'
         data = {}
         data['property'] = self.property.name
         data['mean'] = self.get_mean()
@@ -101,8 +101,6 @@ class eval_results:
         print(f"Data saved to {filename}")
     
     def save_data_interim(self, filename = None, initial = False, final = False):
-        if filename is None:
-            filename = self.property.name + '.json'
         if initial:
             data = {}
             data['property'] = self.property.name
@@ -114,28 +112,22 @@ class eval_results:
             }
             with open(filename, 'w') as f:
                 json.dump(data, f, indent=4)
-        elif final:
-            with open(filename, 'r') as f:
-                data = json.load(f)
-                
-            data['final'] = {
-                'mean': self.get_mean(),
-                'variance': self.get_variance(),
-                'std': self.get_std(),
-                'confidence_interval': self.get_confidence_interval()
-            }
         else:
             with open(filename, 'r') as f:
                 data = json.load(f)
-                
-            data[str(self.total_episodes)] = {
+            name = None
+            if final:
+                name = 'final'
+            else:
+                name = str(self.total_episodes)    
+            data[name] = {
                 'mean': self.get_mean(),
                 'variance': self.get_variance(),
                 'std': self.get_std(),
                 'confidence_interval': self.get_confidence_interval()
             }
-            
         with open(filename, 'w') as f:
                 json.dump(data, f, indent=4)
-        #TODO: "saved data to..."
+        if final:
+            print(f"Data saved to {filename}")
           

@@ -5,7 +5,6 @@ from dsmc.property import Property, ReturnProperty
 import dsmc.statistics as stats
 
 from typing import Dict
-#TODO: import stable_baselines3 and pgtg
 
 class Evaluator:
 
@@ -43,11 +42,9 @@ class Evaluator:
             for property in self.properties.values():
                 results_per_property[property.name].extend(property.check(trajectory))
 
-    # 2 modes: either results are saved in json file after each n episodes or only at the end
+    # DONE: 2 modes: either results are saved in json file after each n episodes or only at the end
     # json file is named after the corresponding property's name
-    #TODO: fix act_function
-    #TODO: Correction Term
-    #TODO: make interim_amount configurable
+    
     def eval(self, agent, epsilon: float = 0.1, kappa: float = 0.05, act_function = None, save_interim_results: bool = False):
         # initialize EvaluationResults object for each class and whether the property converged
         results_per_property = {}
@@ -63,7 +60,7 @@ class Evaluator:
             results_per_property[property.name].total_episodes = self.initial_episodes
         if save_interim_results:
             for property in self.properties.values():
-                results_per_property[property.name].save_data_interim(initial = True)
+                results_per_property[property.name].save_data_interim(filename = property.json_filename, initial = True)
         # compute the CH bound
         ch_bound = stats.CH(kappa, epsilon)
         # run the policy until all properties have converged
@@ -76,7 +73,7 @@ class Evaluator:
                 
             if save_interim_results:
                 for property in self.properties.values():
-                    results_per_property[property.name].save_data_interim()
+                    results_per_property[property.name].save_data_interim(filename = property.json_filename)
 
             # compute for each property the APMC bound and the confidence interval length
             for property in self.properties.values():
@@ -95,11 +92,11 @@ class Evaluator:
                 if not save_interim_results:
                     for property in self.properties.values():
                         property_results = results_per_property[property.name]
-                        property_results.save_data_end()
+                        property_results.save_data_end(filename = property.json_filename)
                 else:
                     for property in self.properties.values():
                         property_results = results_per_property[property.name]
-                        property_results.save_data_interim(final = True)
+                        property_results.save_data_interim(filename = property.json_filename, final = True)
                 break
 
         return results_per_property

@@ -6,7 +6,7 @@ class RandomAgent:
     def __init__(self, env):
         self.env = env
 
-    def predict(self, _):
+    def act(self, _):
         return self.env.action_space.sample()
 
     def learn(self, total_timesteps):
@@ -15,7 +15,7 @@ class RandomAgent:
             terminated = False
             truncated = False
             while not (terminated or truncated):
-                action = self.predict(state)
+                action = self.act(state)
                 _, _, terminated, truncated, _ = self.env.step(action)
 
 env = gym.make("CartPole-v1")
@@ -27,4 +27,4 @@ evaluator = Evaluator(env=env)
 evaluator.register_property()
 grp_prop = prop.GoalReachingProbabilityProperty()
 evaluator.register_property(grp_prop)
-results = evaluator.eval(model, epsilon=0.1, kappa=0.05, save_interim_results=True)
+results = evaluator.eval(model, epsilon=0.1, kappa=0.05,act_function = model.act, save_interim_results=True)
