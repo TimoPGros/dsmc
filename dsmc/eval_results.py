@@ -99,9 +99,43 @@ class eval_results:
         with open(filename, 'w') as f:
             json.dump(data, f, indent=4)
         print(f"Data saved to {filename}")
-        return data
     
-    def save_data_interim(self, filename = None):
-        #TODO: implement
-        pass
+    def save_data_interim(self, filename = None, initial = False, final = False):
+        if filename is None:
+            filename = self.property.name + '.json'
+        if initial:
+            data = {}
+            data['property'] = self.property.name
+            data[str(self.total_episodes)] = {
+                'mean': self.get_mean(),
+                'variance': self.get_variance(),
+                'std': self.get_std(),
+                'confidence_interval': self.get_confidence_interval()
+            }
+            with open(filename, 'w') as f:
+                json.dump(data, f, indent=4)
+        elif final:
+            with open(filename, 'r') as f:
+                data = json.load(f)
+                
+            data['final'] = {
+                'mean': self.get_mean(),
+                'variance': self.get_variance(),
+                'std': self.get_std(),
+                'confidence_interval': self.get_confidence_interval()
+            }
+        else:
+            with open(filename, 'r') as f:
+                data = json.load(f)
+                
+            data[str(self.total_episodes)] = {
+                'mean': self.get_mean(),
+                'variance': self.get_variance(),
+                'std': self.get_std(),
+                'confidence_interval': self.get_confidence_interval()
+            }
             
+        with open(filename, 'w') as f:
+                json.dump(data, f, indent=4)
+        #TODO: "saved data to..."
+          
