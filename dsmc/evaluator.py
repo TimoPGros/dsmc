@@ -45,7 +45,7 @@ class Evaluator:
     # DONE: 2 modes: either results are saved in json file after each n episodes or only at the end
     # json file is named after the corresponding property's name
     
-    def eval(self, agent, epsilon: float = 0.1, kappa: float = 0.05, act_function = None, save_interim_results: bool = False):
+    def eval(self, agent, epsilon: float = 0.1, kappa: float = 0.05, act_function = None, save_interim_results: bool = False, output_full_results_list: bool = False):
         # initialize EvaluationResults object for each class and whether the property converged
         results_per_property = {}
         converged_per_property = {}
@@ -60,7 +60,7 @@ class Evaluator:
             results_per_property[property.name].total_episodes = self.initial_episodes
         if save_interim_results:
             for property in self.properties.values():
-                results_per_property[property.name].save_data_interim(filename = property.json_filename, initial = True)
+                results_per_property[property.name].save_data_interim(filename = property.json_filename, initial = True, output_full_results_list = output_full_results_list)
         # compute the CH bound
         ch_bound = stats.CH(kappa, epsilon)
         # run the policy until all properties have converged
@@ -73,7 +73,7 @@ class Evaluator:
                 
             if save_interim_results:
                 for property in self.properties.values():
-                    results_per_property[property.name].save_data_interim(filename = property.json_filename)
+                    results_per_property[property.name].save_data_interim(filename = property.json_filename, output_full_results_list = output_full_results_list)
 
             # compute for each property the APMC bound and the confidence interval length
             for property in self.properties.values():
@@ -92,11 +92,11 @@ class Evaluator:
                 if not save_interim_results:
                     for property in self.properties.values():
                         property_results = results_per_property[property.name]
-                        property_results.save_data_end(filename = property.json_filename)
+                        property_results.save_data_end(filename = property.json_filename, output_full_results_list = output_full_results_list)
                 else:
                     for property in self.properties.values():
                         property_results = results_per_property[property.name]
-                        property_results.save_data_interim(filename = property.json_filename, final = True)
+                        property_results.save_data_interim(filename = property.json_filename, final = True, output_full_results_list = output_full_results_list)
                 break
 
         return results_per_property

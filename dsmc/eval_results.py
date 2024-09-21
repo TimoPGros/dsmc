@@ -89,9 +89,13 @@ class eval_results:
     
     # DONE: implemented save_data_end and save_data_interim
     # DONE: switched to json format
-    def save_data_end(self, filename = None):
+    def save_data_end(self, filename: str = None, output_full_results_list: bool = False):
+        if not filename.endswith(".json"):
+            filename += ".json"
         data = {}
         data['property'] = self.property.name
+        if output_full_results_list:
+            data['full_results_list'] = self.get_all().tolist()
         data['mean'] = self.get_mean()
         data['variance'] = self.get_variance()
         data['std'] = self.get_std()
@@ -100,16 +104,27 @@ class eval_results:
             json.dump(data, f, indent=4)
         print(f"Data saved to {filename}")
     
-    def save_data_interim(self, filename = None, initial = False, final = False):
+    def save_data_interim(self, filename: str = None, initial: bool = False, final: bool = False, output_full_results_list: bool = False):
+        if not filename.endswith(".json"):
+            filename += ".json"
         if initial:
             data = {}
             data['property'] = self.property.name
-            data[str(self.total_episodes)] = {
-                'mean': self.get_mean(),
-                'variance': self.get_variance(),
-                'std': self.get_std(),
-                'confidence_interval': self.get_confidence_interval()
-            }
+            if output_full_results_list:
+                data[str(self.total_episodes)] = {
+                    'full_results_list': self.get_all().tolist(),
+                    'mean': self.get_mean(),
+                    'variance': self.get_variance(),
+                    'std': self.get_std(),
+                    'confidence_interval': self.get_confidence_interval()
+                }
+            else:
+                data[str(self.total_episodes)] = {
+                    'mean': self.get_mean(),
+                    'variance': self.get_variance(),
+                    'std': self.get_std(),
+                    'confidence_interval': self.get_confidence_interval()
+                }
             with open(filename, 'w') as f:
                 json.dump(data, f, indent=4)
         else:
@@ -119,13 +134,22 @@ class eval_results:
             if final:
                 name = 'final'
             else:
-                name = str(self.total_episodes)    
-            data[name] = {
-                'mean': self.get_mean(),
-                'variance': self.get_variance(),
-                'std': self.get_std(),
-                'confidence_interval': self.get_confidence_interval()
-            }
+                name = str(self.total_episodes) 
+            if output_full_results_list:
+                data[name] = {
+                    'full_results_list': self.get_all().tolist(),
+                    'mean': self.get_mean(),
+                    'variance': self.get_variance(),
+                    'std': self.get_std(),
+                    'confidence_interval': self.get_confidence_interval()
+                }
+            else:   
+                data[name] = {
+                    'mean': self.get_mean(),
+                    'variance': self.get_variance(),
+                    'std': self.get_std(),
+                    'confidence_interval': self.get_confidence_interval()
+                }
         with open(filename, 'w') as f:
                 json.dump(data, f, indent=4)
         if final:
