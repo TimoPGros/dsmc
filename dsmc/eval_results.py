@@ -150,7 +150,7 @@ class eval_results:
                     'std': self.get_std(),
                     'confidence_interval': self.get_confidence_interval()
                 }
-        with open(filename, 'w') as f:
+            with open(filename, 'w') as f:
                 json.dump(data, f, indent=4)
         if final:
             print(f"Data saved to {filename}")

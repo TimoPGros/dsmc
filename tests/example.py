@@ -24,6 +24,6 @@ model = RandomAgent(env)
 model.learn(total_timesteps=1000)
 
 evaluator = Evaluator(env=env)
-return_prop = prop.ReturnProperty(json_filename="test_return.json")
+return_prop = prop.ReturnProperty(json_filename="custom_interval_return.json")
 evaluator.register_property(return_prop)
-results = evaluator.eval(model, epsilon=0.1, kappa=0.05,act_function = model.act, save_interim_results=True, output_full_results_list=True)
+results = evaluator.eval(model, epsilon=0.1, kappa=0.05,act_function = model.act, save_interim_results=True)
