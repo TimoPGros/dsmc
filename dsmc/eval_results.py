@@ -89,6 +89,7 @@ class eval_results:
     
     # DONE: implemented save_data_end and save_data_interim
     # DONE: switched to json format
+    # DONE: customizability of filenames, interim result interval, and wether or not whole result list is saved
     def save_data_end(self, filename: str = None, output_full_results_list: bool = False):
         if not filename.endswith(".json"):
             filename += ".json"

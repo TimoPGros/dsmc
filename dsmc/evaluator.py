@@ -3,12 +3,13 @@ import gymnasium as gym
 from gymnasium import Env as GymEnv
 from dsmc.property import Property, ReturnProperty
 import dsmc.statistics as stats
+import pgtg
 
 from typing import Dict
 
 class Evaluator:
 
-    def __init__(self, env: GymEnv = gym.make("CartPole-v1"), gamma: float = 0.99, initial_episodes: int = 100, evaluation_episodes: int = 50):
+    def __init__(self, env: GymEnv = gym.make("pgtg-v3"), gamma: float = 0.99, initial_episodes: int = 100, evaluation_episodes: int = 50):
         self.env = env
         self.gamma = gamma
         self.initial_episodes = initial_episodes
@@ -22,19 +23,18 @@ class Evaluator:
         self.properties[property.name] = property
 
     def __run_policy(self, agent, num_episodes: int, results_per_property: Dict[str, eval_results], act_function, save_interim_results: bool = False, output_full_results_list: bool = False, initial: bool =False, interim_interval: int = None):
-        if act_function is None:
-            act_function = agent.predict
-            
+        act_function = act_function or agent.predict            
         if not callable(act_function):
             raise ValueError("act_function should be a function.")
         
         for _ in range(num_episodes):
-            state = self.env.reset()
+            state, _ = self.env.reset()
             trajectory = []
             terminated = False
             truncated = False
             while not (terminated or truncated):
-                action = act_function(state)
+                action, _ = act_function(state)
+                action = int(action)
                 next_state, reward, terminated, truncated, _ = self.env.step(action)
                 trajectory.append((state, action, reward))
                 state = next_state
@@ -44,8 +44,8 @@ class Evaluator:
             for property in self.properties.values():
                 results_per_property[property.name].extend(property.check(trajectory))
                 results_per_property[property.name].total_episodes += 1
-            if self.made_episodes % interim_interval == 0:
-                if save_interim_results:
+            if save_interim_results:
+                if self.made_episodes % interim_interval == 0:
                     if initial:
                         for property in self.properties.values():
                             results_per_property[property.name].save_data_interim(filename = property.json_filename, initial = True, output_full_results_list = output_full_results_list)
@@ -60,9 +60,9 @@ class Evaluator:
     
     def eval(self, agent, epsilon: float = 0.1, kappa: float = 0.05, act_function = None, save_interim_results: bool = False, output_full_results_list: bool = False):
         interim_interval = None
+        #DONE: customize interval
         if save_interim_results:
-            interim_interval = input("Enter the number of episodes after which interim results should be saved: ")
-            interim_interval = int(interim_interval)
+            interim_interval = int(input("Enter the number of episodes after which interim results should be saved: "))
         # initialize EvaluationResults object for each class and whether the property converged
         results_per_property = {}
         converged_per_property = {}
