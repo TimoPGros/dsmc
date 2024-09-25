@@ -19,8 +19,10 @@ class Evaluator:
         self.made_episodes = 0
 
     # register a new evaluation property
-    def register_property(self, property: Property = ReturnProperty()):
+    def register_property(self, property: Property = ReturnProperty(), json_filename: str = None):
         self.properties[property.name] = property
+        if json_filename != None:
+            property.json_filename = json_filename
 
     def __run_policy(self, agent, num_episodes: int, results_per_property: Dict[str, eval_results], act_function, save_interim_results: bool = False, output_full_results_list: bool = False, initial: bool =False, interim_interval: int = None):
         act_function = act_function or agent.predict            
@@ -55,12 +57,11 @@ class Evaluator:
                             results_per_property[property.name].save_data_interim(filename = property.json_filename, output_full_results_list = output_full_results_list)
                 
             
-    # DONE: 2 modes: either results are saved in json file after each n episodes or only at the end
+    # 2 modes: either results are saved in json file after each n episodes or only at the end
     # json file is named after the corresponding property's name
     
     def eval(self, agent, epsilon: float = 0.1, kappa: float = 0.05, act_function = None, save_interim_results: bool = False, output_full_results_list: bool = False):
         interim_interval = None
-        #DONE: customize interval
         if save_interim_results:
             interim_interval = int(input("Enter the number of episodes after which interim results should be saved: "))
         # initialize EvaluationResults object for each class and whether the property converged
