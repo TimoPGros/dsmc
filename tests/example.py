@@ -12,6 +12,6 @@ model = DQN("MlpPolicy", env,verbose=1)
 model.learn(total_timesteps=1000, log_interval=100)
 
 evaluator = Evaluator(env=env)
-smooth_property = prop.StateTransitionSmoothnessProperty()
-evaluator.register_property(smooth_property)
+early_property = prop.EarlyTerminationProperty(threshold=5)
+evaluator.register_property(early_property)
 results = evaluator.eval(model, epsilon=0.1, kappa=0.05, save_interim_results=True)
