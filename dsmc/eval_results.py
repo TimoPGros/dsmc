@@ -2,6 +2,7 @@ import numpy as np
 from scipy.stats import norm
 from scipy.stats import t
 import json
+import os
 
 class eval_results:
     
@@ -12,6 +13,7 @@ class eval_results:
         self.var = None
         self.mean = None
         self.std = None
+        self.anything_written = False
     
     def get_all(self):
         return self.__result_dict
@@ -87,9 +89,6 @@ class eval_results:
     def extend(self, new_result: float):
             self.__result_dict = np.append(self.__result_dict, np.array([new_result]))          
     
-    # DONE: implemented save_data_end and save_data_interim
-    # DONE: switched to json format
-    # DONE: customizability of filenames, interim result interval, and wether or not whole result list is saved
     def save_data_end(self, filename: str = None, output_full_results_list: bool = False):
         if not filename.endswith(".json"):
             filename += ".json"
@@ -103,6 +102,7 @@ class eval_results:
         data['confidence_interval'] = self.get_confidence_interval()
         with open(filename, 'w') as f:
             json.dump(data, f, indent=4)
+        self.anything_written = True
         print(f"Data saved to {filename}")
     
     def save_data_interim(self, filename: str = None, initial: bool = False, final: bool = False, output_full_results_list: bool = False):
@@ -128,9 +128,16 @@ class eval_results:
                 }
             with open(filename, 'w') as f:
                 json.dump(data, f, indent=4)
+            self.anything_written = True
         else:
-            with open(filename, 'r') as f:
-                data = json.load(f)
+            if os.path.exists(filename) and self.anything_written:
+                with open(filename, 'r') as f:
+                    data = json.load(f)
+            else:
+                with open(filename, 'w') as f:
+                    pass
+                data = {}
+                data['property'] = self.property.name
             name = None
             if final:
                 name = 'final'
@@ -153,6 +160,7 @@ class eval_results:
                 }
             with open(filename, 'w') as f:
                 json.dump(data, f, indent=4)
+            self.anything_written = True
         if final:
             print(f"Data saved to {filename}")
           

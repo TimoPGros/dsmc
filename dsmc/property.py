@@ -216,7 +216,7 @@ class ActionTakenProperty(Property):
 class ConsecutiveSameActionProperty(Property):
     def __init__(self, name: str = "consecutive_same_action", action: int = 0, steps: int = 10):
         super().__init__(name)
-        self.idle_action = action
+        self.action = action
         self.steps = steps
         self.binomial = True
         
