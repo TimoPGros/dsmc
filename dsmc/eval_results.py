@@ -29,11 +29,14 @@ class eval_results:
             num0 = self.total_episodes - num1
             n = num0 + num1
             x = num0 / n * 0.0 + num1 / n * 1.0
-            var = num0 / (n - 1) * np.power((0.0 - x), 2) + num1 / (n - 1) * np.power((1.0 - x), 2)
+            if (n==1):
+                var = 0.0
+            else:
+                var = num0 / (n - 1) * np.power((0.0 - x), 2) + num1 / (n - 1) * np.power((1.0 - x), 2)
             self.var = var 
             return var   
         else:
-            var = np.var(self.__result_dict) 
+            var = np.var(self.__result_dict, ddof=1) 
             self.var = var
             return var
                
@@ -78,11 +81,14 @@ class eval_results:
             else:
                 std = self.std
             n = len(self.__result_dict)
-            t_stat = t(df=n - 1).ppf((kappa / 2, 1 - kappa / 2))[-1]
-            interval = [
-                mean - t_stat * std / np.sqrt(n),
-                mean + t_stat * std / np.sqrt(n),
-            ]
+            if (n == 1):
+                return [mean, mean]
+            else:
+                t_stat = t(df=n - 1).ppf((kappa / 2, 1 - kappa / 2))[-1]
+                interval = [
+                    mean - t_stat * std / np.sqrt(n),
+                    mean + t_stat * std / np.sqrt(n),
+                ]
 
             return interval
            
