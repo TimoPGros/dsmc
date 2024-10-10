@@ -1,20 +1,21 @@
-from dsmc.eval_results import eval_results
 import gymnasium as gym
 from gymnasium import Env as GymEnv
+import pgtg
+from typing import Dict, Any
+from dsmc.eval_results import eval_results
 from dsmc.property import Property, ReturnProperty
 import dsmc.statistics as stats
-import pgtg
 
-from typing import Dict
-
+# Main evaluator class
 class Evaluator:
 
+    # initial_episodes: number of episodes to run before initially
+    # evaluation_episodes: number of episodes to run in each iteration after the initial episodes
     def __init__(self, env: GymEnv = gym.make("pgtg-v3"), gamma: float = 0.99, initial_episodes: int = 100, evaluation_episodes: int = 50):
         self.env = env
         self.gamma = gamma
         self.initial_episodes = initial_episodes
         self.evaluation_episodes = evaluation_episodes
-
         self.properties = {}
         self.made_episodes = 0
 
@@ -24,11 +25,11 @@ class Evaluator:
         if json_filename != None:
             property.json_filename = json_filename
 
-    def __run_policy(self, agent, num_episodes: int, results_per_property: Dict[str, eval_results], act_function, save_interim_results: bool = False, output_full_results_list: bool = False, initial: bool =False, interim_interval: int = None):
+    # run the policy for a specified number of episodes
+    def __run_policy(self, agent: Any = None, num_episodes: int = 50, results_per_property: Dict[str, eval_results] = None, act_function = None, save_interim_results: bool = False, output_full_results_list: bool = False, initial: bool =False, interim_interval: int = None):
         act_function = act_function or agent.predict            
         if not callable(act_function):
-            raise ValueError("act_function should be a function.")
-        
+            raise ValueError("act_function should be a function.")        
         for _ in range(num_episodes):
             state, _ = self.env.reset()
             trajectory = []
@@ -55,11 +56,11 @@ class Evaluator:
                     else:    
                         for property in self.properties.values():
                             results_per_property[property.name].save_data_interim(filename = property.json_filename, output_full_results_list = output_full_results_list)
-                
-            
-    # 2 modes: either results are saved in json file after each n episodes or only at the end
-    # json file is named after the corresponding property's name
     
+    # evaluate the agent
+    #act_function: specifies the function to be used to get the action in your agent implementation
+    #save_interim_results: if True, the results are saved every few episodes (number can be specified when running the evaluation)
+    #output_full_results_list: if True, the full list of results is saved in the json file
     def eval(self, agent, epsilon: float = 0.1, kappa: float = 0.05, act_function = None, save_interim_results: bool = False, output_full_results_list: bool = False):
         interim_interval = None
         if save_interim_results:
@@ -94,6 +95,7 @@ class Evaluator:
                 else:
                     converged_per_property[property.name] = False
 
+            # if all properties have converged, save the results and break the loop
             if all(converged_per_property.values()):
                 if not save_interim_results:
                     for property in self.properties.values():

@@ -1,12 +1,14 @@
+import json
 import numpy as np
+import os
 from scipy.stats import norm
 from scipy.stats import t
-import json
-import os
+import dsmc.property as prop
 
+# Class to store the results of the evaluation of a property
 class eval_results:
     
-    def __init__(self, property):
+    def __init__(self, property: prop.Property = prop.ReturnProperty()):
         self.__result_dict = np.array([])
         self.property = property
         self.total_episodes = 0
@@ -15,14 +17,17 @@ class eval_results:
         self.std = None
         self.anything_written = False
     
+    # Returns the whole array of results
     def get_all(self):
         return self.__result_dict
-            
+    
+    # Returns the mean of the results     
     def get_mean(self):
         mean = np.mean(self.__result_dict) 
         self.mean = mean
         return mean      
     
+    # Returns the variance of the results
     def get_variance(self):
         if self.property.binomial:
             num1 = self.__result_dict.sum()
@@ -40,7 +45,7 @@ class eval_results:
             self.var = var
             return var
                
-    
+    # Returns the standard deviation of the results
     def get_std(self):
         var = None
         if self.var is None:
@@ -50,7 +55,8 @@ class eval_results:
         std = np.sqrt(var)
         self.std = std     
         return std
-        
+    
+    # Returns the confidence interval of the results, according to kappa  
     def get_confidence_interval(self, kappa: float = 0.05):
         if self.property.binomial:
             num1 = self.__result_dict.sum()
@@ -91,10 +97,13 @@ class eval_results:
                 ]
 
             return interval
-           
-    def extend(self, new_result: float):
+    
+    # Adds a new result to the array
+    def extend(self, new_result: float = 0.0):
             self.__result_dict = np.append(self.__result_dict, np.array([new_result]))          
     
+    # Only saves information about the property once evaluation is finished
+    # output_full_results_list: if True, the full list of results is saved in the json file
     def save_data_end(self, filename: str = None, output_full_results_list: bool = False):
         if not filename.endswith(".json"):
             filename += ".json"
@@ -111,6 +120,10 @@ class eval_results:
         self.anything_written = True
         print(f"Data saved to {filename}")
     
+    # Saves information about the property every few episodes (number can be specified when running the evaluation)
+    # initial: Set to True when called for the first time in the evaluation
+    # final: Set to True when called for the last time in the evaluation
+    # output_full_results_list: if True, the full list of results is saved in the json file
     def save_data_interim(self, filename: str = None, initial: bool = False, final: bool = False, output_full_results_list: bool = False):
         if not filename.endswith(".json"):
             filename += ".json"
