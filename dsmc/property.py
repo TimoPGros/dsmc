@@ -14,7 +14,7 @@ class Property:
 
 # metric that checks if the goal has been reached
 class GoalReachingProbabilityProperty(Property):
-    def __init__(self, name: str = "grp", goal_reward: float = 100):
+    def __init__(self, name: str = "goal_reaching_probability", goal_reward: float = 100):
         super().__init__(name)
         self.goal_reward = goal_reward
         self.binomial = True
@@ -100,7 +100,7 @@ class ActionEntropyProperty(Property):
 # metric that calculates how efficient the path taken is compared to the optimal path
     
 class PathEfficiencyProperty(Property):
-    def __init__(self, name: str = "path_efficiency", optimal_path: List[int] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]):
+    def __init__(self, name: str = "path_efficiency", optimal_path: List[Any] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]):
         super().__init__(name)
         self.optimal_path = optimal_path
         self.binomial = False
@@ -112,7 +112,7 @@ class PathEfficiencyProperty(Property):
 # metric that calculates how efficient the path taken is compared to the optimal path's length (if whole path not explicitely known)
 
 class PathLengthEfficiencyProperty(Property):
-    def __init__(self, name: str = "path_efficiency", optimal_path_length: int = 1):
+    def __init__(self, name: str = "path_length_efficiency", optimal_path_length: int = 1):
         super().__init__(name)
         self.binomial = False
         self.optimal_path_length = optimal_path_length
@@ -133,6 +133,7 @@ class RewardVarianceProperty(Property):
         return np.var(rewards)
     
 # metric that calculates the smoothness of the state transitions
+# IMPORTANT: this metric assumes that states are represented as vectors
 
 class StateTransitionSmoothnessProperty(Property):
     def __init__(self, name: str = "state_transition_smoothness"):
@@ -174,15 +175,15 @@ class StateVisitProperty(Property):
 # metric that tests if agent takes a specific action more than a specified number of times
 
 class ActionThresholdProperty(Property):
-    def __init__(self, name: str = "action_threshold", action_id: int = 0, threshold: int = 10):
+    def __init__(self, name: str = "action_threshold", action: Any = 0, threshold: int = 10):
         super().__init__(name)
-        self.action_id = action_id
+        self.action_id = action
         self.threshold = threshold
         self.binomial = True
         
     def check(self, trajectory: List[Tuple[Any, Any, Any]]) -> float:
         actions = [action for _, action, _ in trajectory]
-        return 1.0 if actions.count(self.action_id) > self.threshold else 0.0
+        return 1.0 if actions.count(self.action_id) >= self.threshold else 0.0
     
 # metric that tests if agent reaches goal state within a specified number of steps
 
@@ -202,7 +203,7 @@ class GoalBeforeStepLimitProperty(Property):
 # metric that tests if agent has taken a specific action
 
 class ActionTakenProperty(Property):
-    def __init__(self, name: str = "specific_action", action: int = 0):
+    def __init__(self, name: str = "action_taken", action: Any = 0):
         super().__init__(name)
         self.action = action
         self.binomial = True
@@ -214,22 +215,22 @@ class ActionTakenProperty(Property):
 # metric that tests if agent has taken specific action for a specified number of consecutive steps
 
 class ConsecutiveSameActionProperty(Property):
-    def __init__(self, name: str = "consecutive_same_action", action: int = 0, steps: int = 10):
+    def __init__(self, name: str = "consecutive_same_action", action: Any = 0, threshold: int = 10):
         super().__init__(name)
         self.action = action
-        self.steps = steps
+        self.threshold = threshold
         self.binomial = True
         
     def check(self, trajectory: List[Tuple[Any, Any, Any]]) -> float:
         actions = [action for _, action, _ in trajectory]
-        idle = 0
+        consecutive = 0
         for action in actions:
             if action == self.action:
-                idle += 1
-                if idle >= self.steps:
+                consecutive += 1
+                if consecutive >= self.threshold:
                     return 1.0
             else:
-                idle = 0
+                consecutive = 0
         return 0.0
     
 # metric that tests if return is above a specified threshold
@@ -250,22 +251,22 @@ class ReturnThresholdProperty(Property):
 # metric that tests if a certain number of unique actions was taken
 
 class ActionVarietyProperty(Property):
-    def __init__(self, name: str = "action_variety", min_unique_actions: int = 3):
-        super().__init__(name)
-        self.min_unique_actions = min_unique_actions
-        self.binomial = True
-
-    def check(self, trajectory: List[Tuple[Any, Any, Any]]) -> float:
-        unique_actions = set([action for _, action, _ in trajectory])
-        return 1.0 if len(unique_actions) >= self.min_unique_actions else 0.0
-    
-# metric that tests if episode was terminated before a certain threshhold
-
-class EarlyTerminationProperty(Property):
-    def __init__(self, name: str = "early_termination", threshold: int = 100):
+    def __init__(self, name: str = "action_variety", threshold: int = 3):
         super().__init__(name)
         self.threshold = threshold
         self.binomial = True
 
     def check(self, trajectory: List[Tuple[Any, Any, Any]]) -> float:
-        return 1.0 if len(trajectory) < self.threshold else 0.0
+        unique_actions = set([action for _, action, _ in trajectory])
+        return 1.0 if len(unique_actions) >= self.threshold else 0.0
+    
+# metric that tests if episode was terminated before a certain step maximum
+
+class EarlyTerminationProperty(Property):
+    def __init__(self, name: str = "early_termination", step_maximum: int = 100):
+        super().__init__(name)
+        self.step_maximum = step_maximum
+        self.binomial = True
+
+    def check(self, trajectory: List[Tuple[Any, Any, Any]]) -> float:
+        return 1.0 if len(trajectory) <= self.step_maximum else 0.0

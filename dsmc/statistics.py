@@ -5,13 +5,13 @@ from scipy.stats import norm
 def CH(kappa: float, eps: float):
     x = 1 / np.power(eps, 2)
     y = np.log(2 / (kappa))
-    res = x * y
+    res = (x * y)/2
 
-    return int(np.floor(res))
+    return int(np.ceil(res))
 
 def APMC(s2: float, kappa: float, eps: float):
     z = norm.ppf(1 - kappa / 2)
-    return np.ceil(4 * z * s2 / np.power(eps, 2))
+    return np.ceil((z**2) * s2 / np.power(eps, 2))
 
 def construct_confidence_interval_length(results: eval_results, kappa: float):
     interval = results.get_confidence_interval(kappa)
