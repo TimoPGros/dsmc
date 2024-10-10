@@ -29,6 +29,8 @@ class eval_results:
     
     # Returns the variance of the results
     def get_variance(self):
+        if len(self.__result_dict) == (0 or 1):
+            return 0.0
         if self.property.binomial:
             num1 = self.__result_dict.sum()
             num0 = self.total_episodes - num1
