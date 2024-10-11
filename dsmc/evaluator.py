@@ -76,7 +76,7 @@ class Evaluator:
         self.made_episodes = 0       
         self.__run_policy(agent, self.initial_episodes, results_per_property, act_function, save_interim_results = save_interim_results, output_full_results_list=output_full_results_list, initial = True, interim_interval = interim_interval)
         # compute the CH bound
-        ch_bound = stats.CH(kappa, epsilon)
+        ch_bound = stats.CH(epsilon, kappa)
         # run the policy until all properties have converged
         while True:
             # run the policy for the specified number of episodes
@@ -86,7 +86,7 @@ class Evaluator:
             for property in self.properties.values():
                 property_results = results_per_property[property.name]
 
-                apmc_bound = stats.APMC(property_results.get_variance(), kappa, epsilon)
+                apmc_bound = stats.APMC(property_results.get_variance(), epsilon, kappa)
                 confidence_interval_length = stats.construct_confidence_interval_length(property_results, kappa)
 
                 # check if the property has converged, property can also become non-converged again!!!

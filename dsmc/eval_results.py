@@ -1,8 +1,10 @@
+import errno
 import json
 import numpy as np
 import os
 from scipy.stats import norm
 from scipy.stats import t
+import time
 import dsmc.property as prop
 
 # Class to store the results of the evaluation of a property
@@ -127,6 +129,7 @@ class eval_results:
     # final: Set to True when called for the last time in the evaluation
     # output_full_results_list: if True, the full list of results is saved in the json file
     def save_data_interim(self, filename: str = None, initial: bool = False, final: bool = False, output_full_results_list: bool = False):
+        retries = 10
         if not filename.endswith(".json"):
             filename += ".json"
         if initial:
@@ -179,8 +182,16 @@ class eval_results:
                     'std': self.get_std(),
                     'confidence_interval': self.get_confidence_interval()
                 }
-            with open(filename, 'w') as f:
-                json.dump(data, f, indent=4)
+            for attempt in range(retries):
+                try:
+                    with open(filename, 'w') as f:
+                        json.dump(data, f, indent=4)
+                    break
+                except OSError as e:
+                    if e.errno == errno.EINVAL and attempt < retries - 1:
+                        time.sleep(0.1)  # Wait a bit before retrying
+                    else:
+                        raise
             self.anything_written = True
         if final:
             print(f"Data saved to {filename}")

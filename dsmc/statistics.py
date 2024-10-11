@@ -3,7 +3,7 @@ from scipy.stats import norm
 from dsmc.eval_results import eval_results
 
 # Calculates the Chernoff-Hoeffding bound: maximum necessary number of episodes, according to kappa and epsilon
-def CH(kappa: float = 0.05, eps: float = 0.1):
+def CH(eps: float = 0.1, kappa: float = 0.05):
     x = 1 / np.power(eps, 2)
     y = np.log(2 / (kappa))
     res = (x * y)/2
@@ -11,7 +11,7 @@ def CH(kappa: float = 0.05, eps: float = 0.1):
     return int(np.ceil(res))
 
 # Calculates another maximum necessary number of episodes, according to kappa, epsilon, and the property's variance
-def APMC(var: float = 0, kappa: float = 0.05, eps: float = 0.1):
+def APMC(var: float = 0, eps: float = 0.1, kappa: float = 0.05):
     z = norm.ppf(1 - kappa / 2)
     return np.ceil((z**2) * var / np.power(eps, 2))
 
