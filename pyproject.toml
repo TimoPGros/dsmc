@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "dsmc"
+name = "dsmc-tool"
 version = "0.1.0"
 description = ""
 authors = ["Ivo Hoese <ivho00001@stud.uni-saarland.de>"]
