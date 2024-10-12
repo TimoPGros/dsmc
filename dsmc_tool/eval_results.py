@@ -5,7 +5,7 @@ import os
 from scipy.stats import norm
 from scipy.stats import t
 import time
-import dsmc.property as prop
+import dsmc_tool.property as prop
 
 # Class to store the results of the evaluation of a property
 class eval_results:

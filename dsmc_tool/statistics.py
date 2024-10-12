@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.stats import norm
-from dsmc.eval_results import eval_results
+from dsmc_tool.eval_results import eval_results
 
 # Calculates the Chernoff-Hoeffding bound: maximum necessary number of episodes, according to kappa and epsilon
 def CH(eps: float = 0.1, kappa: float = 0.05):

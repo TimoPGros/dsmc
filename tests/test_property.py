@@ -2,8 +2,8 @@
 
 import pytest
 import numpy as np
-import dsmc.property as prop
-import dsmc.eval_results as er
+import dsmc_tool.property as prop
+import dsmc_tool.eval_results as er
 
 def test_property_rename():
     property = prop.GoalReachingProbabilityProperty(name="goal")

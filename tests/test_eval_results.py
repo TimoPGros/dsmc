@@ -2,8 +2,8 @@
 
 import pytest
 import numpy as np
-from dsmc.eval_results import eval_results
-import dsmc.property as prop
+from dsmc_tool.eval_results import eval_results
+import dsmc_tool.property as prop
 
 
 def test_get_all_initial():

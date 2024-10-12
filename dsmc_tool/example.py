@@ -3,7 +3,7 @@ from gymnasium.wrappers import FlattenObservation
 import pgtg
 from stable_baselines3 import DQN
 from dsmc.evaluator import Evaluator
-import dsmc.property as prop
+import dsmc_tool.property as prop
 
 env = gym.make("pgtg-v3")
 env = FlattenObservation(env)

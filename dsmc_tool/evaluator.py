@@ -2,9 +2,9 @@ import gymnasium as gym
 from gymnasium import Env as GymEnv
 import pgtg
 from typing import Dict, Any
-from dsmc.eval_results import eval_results
-from dsmc.property import Property, ReturnProperty
-import dsmc.statistics as stats
+from dsmc_tool.eval_results import eval_results
+from dsmc_tool.property import Property, ReturnProperty
+import dsmc_tool.statistics as stats
 
 # Main evaluator class
 class Evaluator:

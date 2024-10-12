@@ -4,9 +4,9 @@ import pytest
 import numpy as np
 import gymnasium as gym
 from gymnasium.wrappers import FlattenObservation
-import dsmc.property as prop
+import dsmc_tool.property as prop
 import pgtg
-from dsmc.eval_results import eval_results
+from dsmc_tool.eval_results import eval_results
 from stable_baselines3 import DQN
 from unittest.mock import patch
 
