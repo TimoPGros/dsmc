@@ -1,1 +1,1 @@
-# dsmc
+A Python package for Deep Statistical Model Checking of Deep Reinforcement Learning agents. DSMC-Tool allows users to evaluate RL agents based on a wide array of properties, making it an essential tool for ensuring robust agent performance. The package is developed to be fully compatible with Gymnasium environments.

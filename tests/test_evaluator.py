@@ -12,7 +12,7 @@ from unittest.mock import patch
 
 from typing import Dict
 
-from dsmc.evaluator import Evaluator
+from dsmc_tool.evaluator import Evaluator
 
 @pytest.fixture
 def mock_input():

@@ -61,7 +61,8 @@ class Evaluator:
     #act_function: specifies the function to be used to get the action in your agent implementation
     #save_interim_results: if True, the results are saved every few episodes (number can be specified when running the evaluation)
     #output_full_results_list: if True, the full list of results is saved in the json file
-    def eval(self, agent, epsilon: float = 0.1, kappa: float = 0.05, act_function = None, save_interim_results: bool = False, output_full_results_list: bool = False):
+    #relative_epsilon: if True, epsilon is scaled by the mean of the property
+    def eval(self, agent, epsilon: float = 0.1, kappa: float = 0.05, act_function = None, save_interim_results: bool = False, output_full_results_list: bool = False, relative_epsilon: bool = False):
         interim_interval = None
         if save_interim_results:
             interim_interval = int(input("Enter the number of episodes after which interim results should be saved: "))
@@ -89,8 +90,13 @@ class Evaluator:
                 apmc_bound = stats.APMC(property_results.get_variance(), epsilon, kappa)
                 confidence_interval_length = stats.construct_confidence_interval_length(property_results, kappa)
 
+                if relative_epsilon:
+                    val = property_results.get_mean()
+                    scaled_epsilon = abs(epsilon * val)
+                else:
+                    scaled_epsilon = epsilon
                 # check if the property has converged, property can also become non-converged again!!!
-                if self.made_episodes > ch_bound or self.made_episodes > apmc_bound or confidence_interval_length < 2 * epsilon:
+                if self.made_episodes > ch_bound or self.made_episodes > apmc_bound or confidence_interval_length < 2 * scaled_epsilon:
                     converged_per_property[property.name] = True
                 else:
                     converged_per_property[property.name] = False
