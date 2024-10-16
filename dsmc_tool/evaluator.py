@@ -9,7 +9,7 @@ import dsmc_tool.statistics as stats
 # Main evaluator class
 class Evaluator:
 
-    # initial_episodes: number of episodes to run before initially
+    # initial_episodes: number of episodes to run before initially (should be considerably larger than evaluation_episodes)
     # evaluation_episodes: number of episodes to run in each iteration after the initial episodes
     def __init__(self, env: GymEnv = gym.make("pgtg-v3"), gamma: float = 0.99, initial_episodes: int = 100, evaluation_episodes: int = 50):
         self.env = env
@@ -36,7 +36,11 @@ class Evaluator:
             terminated = False
             truncated = False
             while not (terminated or truncated):
-                action, _ = act_function(state)
+                output = act_function(state)
+                if isinstance(output, tuple):
+                    action = output[0]
+                else:
+                    action = output
                 action = int(action)
                 next_state, reward, terminated, truncated, _ = self.env.step(action)
                 trajectory.append((state, action, reward))
@@ -48,6 +52,8 @@ class Evaluator:
                 results_per_property[property.name].extend(property.check(trajectory))
                 results_per_property[property.name].total_episodes += 1
             if save_interim_results:
+                if interim_interval == None:
+                    raise ValueError("interim_interval must be specified when save_interim_results is True.")
                 if self.made_episodes % interim_interval == 0:
                     if initial:
                         for property in self.properties.values():
@@ -58,15 +64,15 @@ class Evaluator:
                             results_per_property[property.name].save_data_interim(filename = property.json_filename, output_full_results_list = output_full_results_list)
     
     # evaluate the agent
-    #act_function: specifies the function to be used to get the action in your agent implementation
+    #act_function: specifies the function to be used to get the action in your agent implementation (default is agent.predict, action has to be in the first position of the output)
     #save_interim_results: if True, the results are saved every few episodes (number can be specified when running the evaluation)
+    #interim_interval: specifies the number of episodes after which the results are saved when save_interim_results is True (default is the number of evaluation_episodes)
     #output_full_results_list: if True, the full list of results is saved in the json file
     #relative_epsilon: if True, epsilon is scaled by the mean of the property
-    def eval(self, agent, epsilon: float = 0.1, kappa: float = 0.05, act_function = None, save_interim_results: bool = False, output_full_results_list: bool = False, relative_epsilon: bool = False):
-        interim_interval = None
-        if save_interim_results:
-            interim_interval = int(input("Enter the number of episodes after which interim results should be saved: "))
+    def eval(self, agent, epsilon: float = 0.1, kappa: float = 0.05, act_function = None, save_interim_results: bool = False, interim_interval: int = None, output_full_results_list: bool = False, relative_epsilon: bool = False):
         # initialize EvaluationResults object for each class and whether the property converged
+        if interim_interval == None:
+            interim_interval = self.evaluation_episodes
         results_per_property = {}
         converged_per_property = {}
         for property in self.properties.values():
