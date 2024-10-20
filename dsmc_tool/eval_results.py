@@ -109,6 +109,7 @@ class eval_results:
     # Only saves information about the property once evaluation is finished
     # output_full_results_list: if True, the full list of results is saved in the json file
     def save_data_end(self, filename: str = None, output_full_results_list: bool = False):
+        retries = 10
         if not filename.endswith(".json"):
             filename += ".json"
         data = {}
@@ -119,8 +120,16 @@ class eval_results:
         data['variance'] = self.get_variance()
         data['std'] = self.get_std()
         data['confidence_interval'] = self.get_confidence_interval()
-        with open(filename, 'w') as f:
-            json.dump(data, f, indent=4)
+        for attempt in range(retries):
+                try:
+                    with open(filename, 'w') as f:
+                        json.dump(data, f, indent=4)
+                    break
+                except OSError as e:
+                    if e.errno == errno.EINVAL and attempt < retries - 1:
+                        time.sleep(0.1)
+                    else:
+                        raise
         self.anything_written = True
         print(f"Data saved to {filename}")
     
@@ -189,7 +198,7 @@ class eval_results:
                     break
                 except OSError as e:
                     if e.errno == errno.EINVAL and attempt < retries - 1:
-                        time.sleep(0.1)  # Wait a bit before retrying
+                        time.sleep(0.1)
                     else:
                         raise
             self.anything_written = True

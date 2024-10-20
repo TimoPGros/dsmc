@@ -1,0 +1,21 @@
+{
+    "property": "return",
+    "50": {
+        "mean": -200.0,
+        "variance": 0.0,
+        "std": 0.0,
+        "confidence_interval": [
+            -200.0,
+            -200.0
+        ]
+    },
+    "100": {
+        "mean": -200.0,
+        "variance": 0.0,
+        "std": 0.0,
+        "confidence_interval": [
+            -200.0,
+            -200.0
+        ]
+    }
+}

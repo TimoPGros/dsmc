@@ -26,7 +26,7 @@ class Evaluator:
             property.json_filename = json_filename
 
     # run the policy for a specified number of episodes
-    def __run_policy(self, agent: Any = None, num_episodes: int = 50, results_per_property: Dict[str, eval_results] = None, act_function = None, save_interim_results: bool = False, output_full_results_list: bool = False, initial: bool =False, interim_interval: int = None):
+    def __run_policy(self, agent: Any = None, num_episodes: int = 50, results_per_property: Dict[str, eval_results] = None, act_function = None, save_interim_results: bool = False, output_full_results_list: bool = False, initial: bool =False, interim_interval: int = None, truncation_steps: int = None):
         act_function = act_function or agent.predict            
         if not callable(act_function):
             raise ValueError("act_function should be a function.")        
@@ -35,7 +35,9 @@ class Evaluator:
             trajectory = []
             terminated = False
             truncated = False
+            counter = 0
             while not (terminated or truncated):
+                counter += 1
                 output = act_function(state)
                 if isinstance(output, tuple):
                     action = output[0]
@@ -45,6 +47,9 @@ class Evaluator:
                 next_state, reward, terminated, truncated, _ = self.env.step(action)
                 trajectory.append((state, action, reward))
                 state = next_state
+                if truncation_steps != None:
+                    if counter >= truncation_steps:
+                        truncated = True
 
             # store new results in EvaluationResults object
             self.made_episodes += 1
@@ -69,7 +74,8 @@ class Evaluator:
     #interim_interval: specifies the number of episodes after which the results are saved when save_interim_results is True (default is the number of evaluation_episodes)
     #output_full_results_list: if True, the full list of results is saved in the json file
     #relative_epsilon: if True, epsilon is scaled by the mean of the property
-    def eval(self, agent, epsilon: float = 0.1, kappa: float = 0.05, act_function = None, save_interim_results: bool = False, interim_interval: int = None, output_full_results_list: bool = False, relative_epsilon: bool = False):
+    #truncation_steps: number of steps after which the episode is truncated
+    def eval(self, agent, epsilon: float = 0.1, kappa: float = 0.05, act_function = None, save_interim_results: bool = False, interim_interval: int = None, output_full_results_list: bool = False, relative_epsilon: bool = False, truncation_steps: int = None):
         # initialize EvaluationResults object for each class and whether the property converged
         if interim_interval == None:
             interim_interval = self.evaluation_episodes
@@ -81,13 +87,13 @@ class Evaluator:
 
         # run initial episodes
         self.made_episodes = 0       
-        self.__run_policy(agent, self.initial_episodes, results_per_property, act_function, save_interim_results = save_interim_results, output_full_results_list=output_full_results_list, initial = True, interim_interval = interim_interval)
+        self.__run_policy(agent, self.initial_episodes, results_per_property, act_function, save_interim_results = save_interim_results, output_full_results_list=output_full_results_list, initial = True, interim_interval = interim_interval, truncation_steps = truncation_steps)
         # compute the CH bound
         ch_bound = stats.CH(epsilon, kappa)
         # run the policy until all properties have converged
         while True:
             # run the policy for the specified number of episodes
-            self.__run_policy(agent, self.evaluation_episodes, results_per_property, act_function, save_interim_results = save_interim_results, output_full_results_list=output_full_results_list, interim_interval = interim_interval)
+            self.__run_policy(agent, self.evaluation_episodes, results_per_property, act_function, save_interim_results = save_interim_results, output_full_results_list=output_full_results_list, interim_interval = interim_interval, truncation_steps = truncation_steps)
            
             # compute for each property the APMC bound and the confidence interval length
             for property in self.properties.values():
