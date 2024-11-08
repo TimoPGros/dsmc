@@ -6,7 +6,7 @@ import gymnasium as gym
 from gymnasium.wrappers import FlattenObservation
 import dsmc_tool.property as prop
 import pgtg
-from dsmc_tool.eval_results import eval_results
+from dsmc_tool.Eval_results import Eval_results
 from stable_baselines3 import DQN
 from unittest.mock import patch
 
@@ -34,7 +34,7 @@ def test_run_policy_episode_update():
     evaluator.register_property(early_property)
     results_per_property = {}
     for property in evaluator.properties.values():
-            results_per_property[property.name] = eval_results(property=property)
+            results_per_property[property.name] = Eval_results(property=property)
     agent = DQN("MlpPolicy", env, verbose=1)
     evaluator._Evaluator__run_policy(agent, 7, results_per_property, None, False, False, True, 1)
     assert results_per_property[early_property.name].total_episodes == 7
@@ -48,7 +48,7 @@ def test_run_policy_trajectory_update():
     evaluator.register_property(early_property)
     results_per_property = {}
     for property in evaluator.properties.values():
-            results_per_property[property.name] = eval_results(property=property)
+            results_per_property[property.name] = Eval_results(property=property)
     agent = DQN("MlpPolicy", env, verbose=1)
     evaluator._Evaluator__run_policy(agent, 7, results_per_property, None, False, False, True, 1)
     assert results_per_property[early_property.name].get_all().size == 7
@@ -61,7 +61,7 @@ def test_run_policy_act_function():
     evaluator.register_property(early_property)
     results_per_property = {}
     for property in evaluator.properties.values():
-            results_per_property[property.name] = eval_results(property=property)
+            results_per_property[property.name] = Eval_results(property=property)
     agent = DQN("MlpPolicy", env, verbose=1)
     act_function = 3
     with pytest.raises(ValueError):
@@ -75,7 +75,7 @@ def test_run_policy_interim_results():
     evaluator.register_property(early_property)
     results_per_property = {}
     for property in evaluator.properties.values():
-            results_per_property[property.name] = eval_results(property=property)
+            results_per_property[property.name] = Eval_results(property=property)
     agent = DQN("MlpPolicy", env, verbose=1)
     evaluator._Evaluator__run_policy(agent, 7, results_per_property, None, True, False, True, 1)
     assert results_per_property[early_property.name].total_episodes == 7
@@ -89,7 +89,7 @@ def test_run_policy_interim_results_final():
     evaluator.register_property(early_property)
     results_per_property = {}
     for property in evaluator.properties.values():
-            results_per_property[property.name] = eval_results(property=property)
+            results_per_property[property.name] = Eval_results(property=property)
     agent = DQN("MlpPolicy", env, verbose=1)
     evaluator._Evaluator__run_policy(agent, 7, results_per_property, None, True, False, True, 1)
     evaluator._Evaluator__run_policy(agent, 7, results_per_property, None, True, False, False, 1)
@@ -104,7 +104,7 @@ def test_run_policy_no_interim_results():
     evaluator.register_property(early_property)
     results_per_property = {}
     for property in evaluator.properties.values():
-            results_per_property[property.name] = eval_results(property=property)
+            results_per_property[property.name] = Eval_results(property=property)
     agent = DQN("MlpPolicy", env, verbose=1)
     evaluator._Evaluator__run_policy(agent, 7, results_per_property, None, False, False, True, 1)
     assert results_per_property[early_property.name].total_episodes == 7
@@ -118,7 +118,7 @@ def test_run_policy_no_interim_results_final():
     evaluator.register_property(early_property)
     results_per_property = {}
     for property in evaluator.properties.values():
-            results_per_property[property.name] = eval_results(property=property)
+            results_per_property[property.name] = Eval_results(property=property)
     agent = DQN("MlpPolicy", env, verbose=1)
     evaluator._Evaluator__run_policy(agent, 7, results_per_property, None, False, False, True, 1)
     evaluator._Evaluator__run_policy(agent, 7, results_per_property, None, False, False, False, 1)
@@ -133,7 +133,7 @@ def test_run_policy_interim_interval():
     evaluator.register_property(early_property)
     results_per_property = {}
     for property in evaluator.properties.values():
-            results_per_property[property.name] = eval_results(property=property)
+            results_per_property[property.name] = Eval_results(property=property)
     agent = DQN("MlpPolicy", env, verbose=1)
     evaluator._Evaluator__run_policy(agent, 7, results_per_property, None, True, False, True, 2)
     assert results_per_property[early_property.name].total_episodes == 7
@@ -147,7 +147,7 @@ def test_run_policy_interim_interval_final():
     evaluator.register_property(early_property)
     results_per_property = {}
     for property in evaluator.properties.values():
-            results_per_property[property.name] = eval_results(property=property)
+            results_per_property[property.name] = Eval_results(property=property)
     agent = DQN("MlpPolicy", env, verbose=1)
     evaluator._Evaluator__run_policy(agent, 7, results_per_property, None, True, False, True, 2)
     evaluator._Evaluator__run_policy(agent, 7, results_per_property, None, True, False, False, 2)
@@ -162,7 +162,7 @@ def test_run_policy_interim_results_full_results_list():
     evaluator.register_property(early_property)
     results_per_property = {}
     for property in evaluator.properties.values():
-            results_per_property[property.name] = eval_results(property=property)
+            results_per_property[property.name] = Eval_results(property=property)
     agent = DQN("MlpPolicy", env, verbose=1)
     evaluator._Evaluator__run_policy(agent, 7, results_per_property, None, True, True, True, 1)
     assert results_per_property[early_property.name].total_episodes == 7
@@ -176,7 +176,7 @@ def test_run_policy_interim_results_final_full_results_list():
     evaluator.register_property(early_property)
     results_per_property = {}
     for property in evaluator.properties.values():
-            results_per_property[property.name] = eval_results(property=property)
+            results_per_property[property.name] = Eval_results(property=property)
     agent = DQN("MlpPolicy", env, verbose=1)
     evaluator._Evaluator__run_policy(agent, 7, results_per_property, None, True, True, True, 1)
     evaluator._Evaluator__run_policy(agent, 7, results_per_property, None, True, True, False, 1)

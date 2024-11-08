@@ -8,7 +8,7 @@ import time
 import dsmc_tool.property as prop
 
 # Class to store the results of the evaluation of a property
-class eval_results:
+class Eval_results:
     
     def __init__(self, property: prop.Property = prop.ReturnProperty()):
         self.__result_dict = np.array([])

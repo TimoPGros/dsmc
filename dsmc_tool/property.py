@@ -150,27 +150,27 @@ class NormalizedReturnProperty(Property):
             ret += trajectory[t][2] * np.power(self.gamma, t)
         return ret / len(trajectory)
 
-# metric that calculates how efficient the path taken is compared to the optimal path    
+# metric that calculates how efficient the path taken is compared to another path    
 class PathEfficiencyProperty(Property):
-    def __init__(self, name: str = "path_efficiency", optimal_path: List[Any] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]):
+    def __init__(self, name: str = "path_efficiency", path: List[Any] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]):
         super().__init__(name)
-        self.optimal_path = optimal_path
+        self.path = path
         self.binomial = False
         
     def check(self, trajectory: List[Tuple[Any, Any, Any]]) -> float:
         actions = [action for _, action, _ in trajectory]
-        return np.mean([a == b for a, b in zip(actions, self.optimal_path)])
+        return np.mean([a == b for a, b in zip(actions, self.path)])
 
-# metric that calculates how efficient the path taken is compared to the optimal path's length (if whole path not explicitely known)
+# metric that calculates how efficient the path taken is compared to another path's length
 class PathLengthEfficiencyProperty(Property):
-    def __init__(self, name: str = "path_length_efficiency", optimal_path_length: int = 1):
+    def __init__(self, name: str = "path_length_efficiency", path_length: int = 1):
         super().__init__(name)
         self.binomial = False
-        self.optimal_path_length = optimal_path_length
+        self.path_length = path_length
 
     def check(self, trajectory: List[Tuple[Any, Any, Any]]) -> float:
         actual_path_length = len(trajectory)
-        return self.optimal_path_length / actual_path_length if actual_path_length > 0 else 0.0
+        return self.path_length / actual_path_length if actual_path_length > 0 else 0.0
 
 # metric that calculates the return of a trajectory
 class ReturnProperty(Property):

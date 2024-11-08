@@ -2,7 +2,7 @@ import gymnasium as gym
 from gymnasium import Env as GymEnv
 import pgtg
 from typing import Dict, Any
-from dsmc_tool.eval_results import eval_results
+from dsmc_tool.eval_results import Eval_results
 from dsmc_tool.property import Property, ReturnProperty
 import dsmc_tool.statistics as stats
 
@@ -25,7 +25,7 @@ class Evaluator:
             property.json_filename = json_filename
 
     # run the policy for a specified number of episodes
-    def __run_policy(self, agent: Any = None, num_episodes: int = 50, results_per_property: Dict[str, eval_results] = None, act_function = None, save_interim_results: bool = False, output_full_results_list: bool = False, initial: bool =False, interim_interval: int = None, truncation_steps: int = None):
+    def __run_policy(self, agent: Any = None, num_episodes: int = 50, results_per_property: Dict[str, Eval_results] = None, exploration_rate: float = None, act_function = None, save_interim_results: bool = False, output_full_results_list: bool = False, initial: bool =False, interim_interval: int = None, truncation_steps: int = None):
         act_function = act_function or agent.get_action           
         if not callable(act_function):
             raise ValueError("act_function should be a function.")        
@@ -37,7 +37,11 @@ class Evaluator:
             counter = 0
             while not (terminated or truncated):
                 counter += 1
-                output = act_function(state)
+                output = None
+                if exploration_rate == None:
+                    output = act_function(state)
+                else:
+                    output = act_function(state, exploration_rate)
                 if isinstance(output, tuple):
                     action = output[0]
                 else:
@@ -77,7 +81,7 @@ class Evaluator:
     #output_full_results_list: if True, the full list of results is saved in the json file
     #relative_epsilon: if True, epsilon is scaled by the mean of the property
     #truncation_steps: number of steps after which the episode is truncated
-    def eval(self, agent, epsilon: float = 0.1, kappa: float = 0.05, act_function = None, save_interim_results: bool = False, interim_interval: int = None, output_full_results_list: bool = False, relative_epsilon: bool = False, truncation_steps: int = None):
+    def eval(self, agent, epsilon: float = 0.1, kappa: float = 0.05, exploration_rate: float = None, act_function = None, save_interim_results: bool = False, interim_interval: int = None, output_full_results_list: bool = False, relative_epsilon: bool = False, truncation_steps: int = None):
         # initialize EvaluationResults object for each class and whether the property converged
         if self.properties == {}: 
             raise ValueError("No properties registered. Use register_property to register properties.")
@@ -86,18 +90,18 @@ class Evaluator:
         results_per_property = {}
         converged_per_property = {}
         for property in self.properties.values():
-            results_per_property[property.name] = eval_results(property=property)
+            results_per_property[property.name] = Eval_results(property=property)
             converged_per_property[property.name] = False
 
         # run initial episodes
         self.made_episodes = 0       
-        self.__run_policy(agent, self.initial_episodes, results_per_property, act_function, save_interim_results = save_interim_results, output_full_results_list=output_full_results_list, initial = True, interim_interval = interim_interval, truncation_steps = truncation_steps)
+        self.__run_policy(agent, self.initial_episodes, results_per_property, exploration_rate, act_function, save_interim_results = save_interim_results, output_full_results_list=output_full_results_list, initial = True, interim_interval = interim_interval, truncation_steps = truncation_steps)
         # compute the CH bound
         ch_bound = stats.CH(epsilon, kappa)
         # run the policy until all properties have converged
         while True:
             # run the policy for the specified number of episodes
-            self.__run_policy(agent, self.subsequent_episodes, results_per_property, act_function, save_interim_results = save_interim_results, output_full_results_list=output_full_results_list, interim_interval = interim_interval, truncation_steps = truncation_steps)
+            self.__run_policy(agent, self.subsequent_episodes, results_per_property, exploration_rate, act_function, save_interim_results = save_interim_results, output_full_results_list=output_full_results_list, interim_interval = interim_interval, truncation_steps = truncation_steps)
            
             # compute for each property the APMC bound and the confidence interval length
             for property in self.properties.values():

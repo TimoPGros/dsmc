@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dsmc-tool"
-version = "0.1.6"
+version = "0.1.7"
 description = ""
 authors = ["Ivo Hoese <ivho00001@stud.uni-saarland.de>"]
 readme = "README.md"

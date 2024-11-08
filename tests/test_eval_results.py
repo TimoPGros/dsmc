@@ -1,19 +1,19 @@
-# Test Suite for eval_results.py
+# Test Suite for Eval_results.py
 
 import pytest
 import numpy as np
-from dsmc_tool.eval_results import eval_results
+from dsmc_tool.Eval_results import Eval_results
 import dsmc_tool.property as prop
 
 
 def test_get_all_initial():
     property = prop.ReturnProperty()
-    results = eval_results(property)
+    results = Eval_results(property)
     assert results.get_all().size == 0
     
 def test_get_all_extended():
     property = prop.ReturnProperty()
-    results = eval_results(property)
+    results = Eval_results(property)
     results.extend(1.0)
     results.extend(2.0)
     results.extend(3.0) 
@@ -21,7 +21,7 @@ def test_get_all_extended():
     
 def test_getter_initial():
     property = prop.ReturnProperty()
-    results = eval_results(property)
+    results = Eval_results(property)
     assert np.isnan(results.get_mean())
     assert np.isnan(results.get_variance())
     assert np.isnan(results.get_std())
@@ -30,7 +30,7 @@ def test_getter_initial():
     
 def test_getter_extended1():
     property = prop.ReturnProperty()
-    results = eval_results(property)
+    results = Eval_results(property)
     results.extend(1.0)
     results.extend(2.0)
     results.extend(3.0)
@@ -42,7 +42,7 @@ def test_getter_extended1():
     
 def test_getter_extended2():
     property = prop.ReturnProperty()
-    results = eval_results(property)
+    results = Eval_results(property)
     results.extend(2.826)
     results.extend(87.16)
     results.extend(87.59)
@@ -54,7 +54,7 @@ def test_getter_extended2():
     
 def test_getter_extended_binomial():
     property = prop.GoalReachingProbabilityProperty()
-    results = eval_results(property)
+    results = Eval_results(property)
     results.extend(1.0)
     results.extend(0.0)
     results.extend(1.0)
@@ -67,7 +67,7 @@ def test_getter_extended_binomial():
     
 def test_get_variance_extended_binomial():
     property = prop.GoalReachingProbabilityProperty()
-    results = eval_results(property)
+    results = Eval_results(property)
     results.extend(1.0)
     results.total_episodes = 1
     assert results.get_variance() == 0.0
