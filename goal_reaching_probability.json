@@ -1,0 +1,39 @@
+{
+    "property": "goal_reaching_probability",
+    "50": {
+        "mean": 1.0,
+        "variance": 0.0,
+        "std": 0.0,
+        "confidence_interval": [
+            1.0,
+            1.0
+        ]
+    },
+    "100": {
+        "mean": 1.0,
+        "variance": 0.0,
+        "std": 0.0,
+        "confidence_interval": [
+            1.0,
+            1.0
+        ]
+    },
+    "150": {
+        "mean": 1.0,
+        "variance": 0.0,
+        "std": 0.0,
+        "confidence_interval": [
+            1.0,
+            1.0
+        ]
+    },
+    "final": {
+        "mean": 1.0,
+        "variance": 0.0,
+        "std": 0.0,
+        "confidence_interval": [
+            1.0,
+            1.0
+        ]
+    }
+}

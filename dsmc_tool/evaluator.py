@@ -1,6 +1,5 @@
 import gymnasium as gym
 from gymnasium import Env as GymEnv
-import pgtg
 from typing import Dict, Any
 from dsmc_tool.eval_results import Eval_results
 from dsmc_tool.property import Property, ReturnProperty
@@ -11,7 +10,7 @@ class Evaluator:
 
     # initial_episodes: number of episodes to run before initially (should be considerably larger than subsequent_episodes)
     # subsequent_episodes: number of episodes to run in each iteration after the initial episodes
-    def __init__(self, env: GymEnv = gym.make("pgtg-v3"), initial_episodes: int = 100, subsequent_episodes: int = 50):
+    def __init__(self, env: GymEnv = None, initial_episodes: int = 100, subsequent_episodes: int = 50):
         self.env = env
         self.initial_episodes = initial_episodes
         self.subsequent_episodes = subsequent_episodes
@@ -75,13 +74,14 @@ class Evaluator:
                             results_per_property[property.name].save_data_interim(filename = property.json_filename, output_full_results_list = output_full_results_list)
     
     # evaluate the agent
+    #exploration_rate: specifies the exploration rate to be used in the agent implementation (default is None)
     #act_function: specifies the function to be used to get the action in your agent implementation (default is agent.get_action, action has to be in the first position of the output)
     #save_interim_results: if True, the results are saved every few episodes
     #interim_interval: specifies the number of episodes after which the results are saved when save_interim_results is True (default is the number of subsequent_episodes)
     #output_full_results_list: if True, the full list of results is saved in the json file
     #relative_epsilon: if True, epsilon is scaled by the mean of the property
     #truncation_steps: number of steps after which the episode is truncated
-    def eval(self, agent, epsilon: float = 0.1, kappa: float = 0.05, exploration_rate: float = None, act_function = None, save_interim_results: bool = False, interim_interval: int = None, output_full_results_list: bool = False, relative_epsilon: bool = False, truncation_steps: int = None):
+    def eval(self, agent = None, epsilon: float = 0.1, kappa: float = 0.05, exploration_rate: float = None, act_function = None, save_interim_results: bool = False, interim_interval: int = None, output_full_results_list: bool = False, relative_epsilon: bool = False, truncation_steps: int = None):
         # initialize EvaluationResults object for each class and whether the property converged
         if self.properties == {}: 
             raise ValueError("No properties registered. Use register_property to register properties.")
