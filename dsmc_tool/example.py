@@ -1,10 +1,11 @@
 import gymnasium as gym
+import pgtg
 from gymnasium.wrappers import FlattenObservation
 from stable_baselines3 import DQN
 from dsmc_tool.evaluator import Evaluator
 import dsmc_tool.property as prop
 
-env = gym.make("CartPole-v1")
+env = gym.make("pgtg-v3")
 env = FlattenObservation(env)
 agent = DQN("MlpPolicy", env, verbose=1)
 agent.learn(total_timesteps=1000)

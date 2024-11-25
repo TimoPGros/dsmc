@@ -10,11 +10,6 @@ def CH(eps: float = 0.1, kappa: float = 0.05):
 
     return int(np.floor(res))
 
-# Calculates another maximum necessary number of episodes, according to kappa, epsilon, and the property's variance
-def APMC(var: float = 0, eps: float = 0.1, kappa: float = 0.05):
-    z = norm.ppf(1 - kappa / 2)
-    return np.ceil(4 * z * var / np.power(eps, 2))
-
 # Calculates the length of a confidence interval
 def construct_confidence_interval_length(results: Eval_results = np.array([]), kappa: float = 0.05):
     interval = results.get_confidence_interval(kappa)

@@ -116,6 +116,7 @@ class Eval_results:
         data['property'] = self.property.name
         if output_full_results_list:
             data['full_results_list'] = self.get_all().tolist()
+        data['total_episodes'] = self.total_episodes
         data['mean'] = self.get_mean()
         data['variance'] = self.get_variance()
         data['std'] = self.get_std()
@@ -145,15 +146,17 @@ class Eval_results:
             data = {}
             data['property'] = self.property.name
             if output_full_results_list:
-                data[str(self.total_episodes)] = {
+                data["episode " + str(self.total_episodes)] = {
                     'full_results_list': self.get_all().tolist(),
+                    'total_episodes': self.total_episodes,
                     'mean': self.get_mean(),
                     'variance': self.get_variance(),
                     'std': self.get_std(),
                     'confidence_interval': self.get_confidence_interval()
                 }
             else:
-                data[str(self.total_episodes)] = {
+                data["episode " + str(self.total_episodes)] = {
+                    'total_episodes': self.total_episodes,
                     'mean': self.get_mean(),
                     'variance': self.get_variance(),
                     'std': self.get_std(),
@@ -179,6 +182,7 @@ class Eval_results:
             if output_full_results_list:
                 data[name] = {
                     'full_results_list': self.get_all().tolist(),
+                    'total_episodes': self.total_episodes,
                     'mean': self.get_mean(),
                     'variance': self.get_variance(),
                     'std': self.get_std(),
@@ -186,6 +190,7 @@ class Eval_results:
                 }
             else:   
                 data[name] = {
+                    'total_episodes': self.total_episodes,
                     'mean': self.get_mean(),
                     'variance': self.get_variance(),
                     'std': self.get_std(),

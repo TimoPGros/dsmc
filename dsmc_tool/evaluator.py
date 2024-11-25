@@ -95,19 +95,20 @@ class Evaluator:
 
         # run initial episodes
         self.made_episodes = 0       
-        self.__run_policy(agent, self.initial_episodes, results_per_property, exploration_rate, act_function, save_interim_results = save_interim_results, output_full_results_list=output_full_results_list, initial = True, interim_interval = interim_interval, truncation_steps = truncation_steps)
         # compute the CH bound
         ch_bound = stats.CH(epsilon, kappa)
         # run the policy until all properties have converged
         while True:
-            # run the policy for the specified number of episodes
-            self.__run_policy(agent, self.subsequent_episodes, results_per_property, exploration_rate, act_function, save_interim_results = save_interim_results, output_full_results_list=output_full_results_list, interim_interval = interim_interval, truncation_steps = truncation_steps)
+            if self.made_episodes == 0:
+                self.__run_policy(agent, self.initial_episodes, results_per_property, exploration_rate, act_function, save_interim_results = save_interim_results, output_full_results_list=output_full_results_list, initial = True, interim_interval = interim_interval, truncation_steps = truncation_steps)
+            else:
+                # run the policy for the specified number of episodes
+                self.__run_policy(agent, self.subsequent_episodes, results_per_property, exploration_rate, act_function, save_interim_results = save_interim_results, output_full_results_list=output_full_results_list, interim_interval = interim_interval, truncation_steps = truncation_steps)
            
             # compute for each property the APMC bound and the confidence interval length
             for property in self.properties.values():
                 property_results = results_per_property[property.name]
 
-                apmc_bound = stats.APMC(property_results.get_variance(), epsilon, kappa)
                 confidence_interval_length = stats.construct_confidence_interval_length(property_results, kappa)
 
                 if relative_epsilon:
@@ -116,7 +117,7 @@ class Evaluator:
                 else:
                     scaled_epsilon = epsilon
                 # check if the property has converged, property can also become non-converged again!!!
-                if self.made_episodes > ch_bound or self.made_episodes > apmc_bound or confidence_interval_length < 2 * scaled_epsilon:
+                if self.made_episodes > ch_bound or confidence_interval_length < 2 * scaled_epsilon:
                     converged_per_property[property.name] = True
                 else:
                     converged_per_property[property.name] = False

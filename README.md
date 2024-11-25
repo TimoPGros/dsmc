@@ -19,7 +19,7 @@ The first step in using DSMC-Tool is initialising an `Evaluator` object from `ds
 
 |Parameter           |Type    |Default Value       |Description                                                         |
 |--------------------|--------|--------------------|--------------------------------------------------------------------|
-|env                 |GymEnv  |None                |Your RL environment, defined as a Gymnasium environment             |
+|env                 |Env     |None                |Your RL environment, defined as a Gymnasium environment             |
 |initial_episodes    |int     |100                 |The number of episodes generated in the initial run of evaluation   |
 |subsequent_episodes |int     |50                  |The number of episodes generated in every run after the initial run |
 
