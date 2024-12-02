@@ -15,3 +15,7 @@ def construct_confidence_interval_length(results: Eval_results = np.array([]), k
     interval = results.get_confidence_interval(kappa)
     confidence_interval_length = interval[1] - interval[0]
     return confidence_interval_length
+
+def APMC(variance, kappa, eps):
+    z = norm.ppf(1 - kappa / 2)
+    return np.ceil(4 * z * variance / np.power(eps, 2))
