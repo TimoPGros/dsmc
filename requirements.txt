@@ -1,0 +1,8 @@
+dsmc_tool
+pgtg
+torch
+stable_baselines3
+numpy
+gymnasium == 0.28.1
+gymnasium[accept-rom-license]
+gymnasium[mujoco]
